@@ -1,6 +1,8 @@
 int X_AXIS = 1;
 int Y_AXIS = 2;
 
+int sun_x, sun_y;
+int sun_size = 100;
 float horizon = 0.65;
 
 PGraphics pg;
@@ -9,8 +11,24 @@ boolean firstDraw;
 void setup() {
   size(1000, 1000);
   
+  sun_x = width / 2;
+  sun_y = (int)(height * horizon / 2);
+  
   pg = createGraphics(width, height);
   firstDraw = true;
+}
+
+void mousePressed() {
+  updateMouse();
+}
+
+void mouseDragged() {
+  updateMouse();
+}
+
+void updateMouse() {
+  sun_x = mouseX;
+  sun_y = mouseY;
 }
 
 void draw() {
@@ -27,6 +45,10 @@ void draw() {
   color color2 = color(80, 90, 50);
   
   drawGradient(pg, 0, 0, width, height * horizon, color1, color2, Y_AXIS);
+  
+  pg.noStroke();
+  pg.fill(15,36,100);
+  pg.ellipse(sun_x, sun_y, sun_size, sun_size);
   
   pg.endDraw();
   image(pg, 0, 0);
