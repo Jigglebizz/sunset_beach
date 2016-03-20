@@ -1,12 +1,17 @@
 int X_AXIS = 1;
 int Y_AXIS = 2;
+int LEFT = 1;
+int RIGHT = 2;
 
 int sun_size = 100;
+int rock_definition = 45;
+int rock_height = 45;
 float horizon = 0.65;
 float wave_t, wave_t_reverse;
 
 int sun_x, sun_y;
 color skyColor1, skyColor2;
+int[] leftRocks, rightRocks;
 
 PGraphics pg;
 boolean firstDraw;
@@ -21,6 +26,8 @@ void setup() {
   
   pg = createGraphics(width, height);
   firstDraw = true;
+  leftRocks = generateRocks(0.33);
+  rightRocks = generateRocks(0.25);
 }
 
 void mousePressed() {
@@ -74,6 +81,8 @@ void draw() {
   pg.fill(15,36,100);
   pg.ellipse(sun_x, sun_y, sun_size, sun_size);
   
+  drawRocks(leftRocks, LEFT);
+  drawRocks(rightRocks, RIGHT);
   pg.endDraw();
   
   // Cut off all the excess junk if the sun goes below the horizon
@@ -103,6 +112,38 @@ void draw() {
   image(pg, 0, 0);
   popMatrix();
   //image(mask, 0, 0);
+}
+
+void drawRocks(int[] rocks, int lr) {
+  pg.fill(0);
+  pg.beginShape();
+  for (int i = 0; i < rocks.length; i+=2) {
+    if (lr == LEFT) {
+      pg.vertex(rocks[i], rocks[i+1]);
+    } else {
+      pg.vertex(width - rocks[i], rocks[i+1]);
+    }
+  }
+  pg.endShape();
+}
+
+// Returns a list of xy coordinates
+int[] generateRocks(float pct_width) {
+  int[] rocks = new int[rock_definition * 2 + 2];
+  rocks[0] = 0;
+  rocks[1] = (int)(height * horizon) + 1;
+  
+  for (int i = 0; i < rock_definition; i++) {
+    rocks[2 + (i * 2)] = i * (int)(((float)width * pct_width) / (float)rock_definition);
+    rocks[3 + (i * 2)] = (int)(height * horizon -                                               // Base of rocks
+                               rock_height * cos(HALF_PI * ((float)i / (float)rock_definition)) +     // Falloff
+                               random(-2, 2));             // Rockiness
+    
+  }
+  
+  rocks[rock_definition * 2 + 1] = rocks[1];
+  
+  return rocks;
 }
 
 PGraphics createMask() {
